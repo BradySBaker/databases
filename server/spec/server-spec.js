@@ -4,19 +4,19 @@
 const mysql = require('mysql2');
 const axios = require('axios');
 
-const API_URL = 'http://127.0.0.1:3000/classes';
+const API_URL = 'http://localhost:3000/classes';
 
 describe('Persistent Node Chat Server', () => {
   const dbConnection = mysql.createConnection({
-    user: 'student',
-    password: 'student',
+    host: 'localhost',
+    user: 'root',
     database: 'chat',
   });
 
   beforeAll((done) => {
     dbConnection.connect();
 
-       const tablename = ''; // TODO: fill this out
+    var tablename = 'messages'; // TODO: fill this out
 
     /* Empty the db table before all tests so that multiple tests
      * (or repeated runs of the tests)  will not fail when they should be passing
@@ -28,10 +28,11 @@ describe('Persistent Node Chat Server', () => {
     dbConnection.end();
   });
 
+  const username = 'Valjean';
+  const message = 'In mercy\'s name, three days is all I need.';
+  const roomname = 'Hello';
+
   it('Should insert posted messages to the DB', (done) => {
-    const username = 'Valjean';
-    const message = 'In mercy\'s name, three days is all I need.';
-    const roomname = 'Hello';
     // Create a user on the chat server database.
     axios.post(`${API_URL}/users`, { username })
       .then(() => {
@@ -43,10 +44,12 @@ describe('Persistent Node Chat Server', () => {
 
         /* TODO: You might have to change this test to get all the data from
          * your message table, since this is schema-dependent. */
-        const queryString = 'SELECT * FROM messages';
+
+        const queryString = 'SELECT * FROM `messages`';
         const queryArgs = [];
 
         dbConnection.query(queryString, queryArgs, (err, results) => {
+          console.log(results);
           if (err) {
             throw err;
           }
@@ -65,26 +68,33 @@ describe('Persistent Node Chat Server', () => {
 
   it('Should output all messages from the DB', (done) => {
     // Let's insert a message into the db
-       const queryString = '';
-       const queryArgs = [];
+    const queryString = '';
+    const queryArgs = [];
     /* TODO: The exact query string and query args to use here
      * depend on the schema you design, so I'll leave them up to you. */
-    dbConnection.query(queryString, queryArgs, (err) => {
-      if (err) {
-        throw err;
-      }
 
-      // Now query the Node chat server and see if it returns the message we just inserted:
-      axios.get(`${API_URL}/messages`)
-        .then((response) => {
-          const messageLog = response.data;
-          expect(messageLog[0].text).toEqual(message);
-          expect(messageLog[0].roomname).toEqual(roomname);
-          done();
-        })
-        .catch((err) => {
-          throw err;
-        });
-    });
+    // Now query the Node chat server and see if it returns the message we just inserted:
+    axios.get(`${API_URL}/messages`)
+      .then((response) => {
+        const messageLog = response.data;
+        expect(messageLog[0].text).toEqual(message);
+        expect(messageLog[0].roomname).toEqual(roomname);
+        done();
+      })
+      .catch((err) => {
+        throw err;
+      });
   });
+
+  // it('Should not create multiple rows/ids for single user', (done) => {
+  //   axios.post(`${API_URL}/users`, { username })
+  //     .then(() => {
+  //       const queryString = 'SELECT * FROM `users`';
+  //       dbConnection.query(queryString, (err, results) => {
+  //         expect(results.length).toEqual(1);
+  //       });
+  //     });
+  // });
+
 });
+

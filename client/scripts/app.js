@@ -1,15 +1,11 @@
-// This App object represents the Chatterbox application.
-// It should initialize the other parts of the application
-// and begin making requests to the Parse API for data.
-//
 var App = {
+
   $spinner: $('.spinner img'),
 
   username: 'anonymous',
 
   initialize: function() {
     App.username = window.location.search.substr(10);
-    App.data = null;
 
     FormView.initialize();
     RoomsView.initialize();
@@ -17,24 +13,23 @@ var App = {
 
     // Fetch initial batch of messages
     App.startSpinner();
-    App.fetch();
+    App.fetch(App.stopSpinner);
 
-    setInterval(function() { App.fetch(RoomsView.$select.val()); }, 3000);
-    // TODO: Make sure the app loads data from the API
-    // continually, instead of just once at the start.
+
+    // Poll for new messages every 3 sec
+    setInterval(App.fetch, 3000);
   },
 
-  fetch: function(roomName = 'Lobby') {
-    App.startSpinner();
+  fetch: function(callback = ()=>{}) {
     Parse.readAll((data) => {
-      // examine the response from the server request:
-      // TODO: Use the data to update Messages and Rooms
-      App.data = data;
-      console.log(App.data);
-      RoomsView.render();
-      RoomsView.handleChange(roomName);
-      App.stopSpinner();
-      // and re-render the corresponding views.
+      data = JSON.parse(data);
+      // Don't bother to update if we have no messages
+      if (data && data.length) {
+        Rooms.update(data, RoomsView.render);
+        Messages.update(data, MessagesView.render);
+      }
+      callback();
+      return;
     });
   },
 
@@ -48,15 +43,3 @@ var App = {
     FormView.setStatus(false);
   }
 };
-
-$(document).ready(function() {
-  $('#rooms select').on('change', function() {
-    RoomsView.handleChange();
-  });
-  $('#rooms button').on('click', function() {
-    RoomsView.handleClick();
-  });
-  $('#chats').on('click', '.username', function(event) {
-    MessagesView.handleClick(event);
-  });
-});

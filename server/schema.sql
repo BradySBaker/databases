@@ -18,8 +18,8 @@ USE chat;
 DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
-  `id` INTEGER,
-  `name` VARCHAR(255),
+  `id` INTEGER NOT NULL AUTO_INCREMENT,
+  `username` VARCHAR(255),
   PRIMARY KEY (`id`)
 );
 
@@ -31,7 +31,7 @@ CREATE TABLE `users` (
 DROP TABLE IF EXISTS `messages`;
 
 CREATE TABLE `messages` (
-  `id` INTEGER,
+  `id` INTEGER NOT NULL AUTO_INCREMENT,
   `text` VARCHAR(4000),
   `id_users` INTEGER,
   `id_rooms` INTEGER,
@@ -46,8 +46,8 @@ CREATE TABLE `messages` (
 DROP TABLE IF EXISTS `rooms`;
 
 CREATE TABLE `rooms` (
-  `id` INTEGER,
-  `name` VARCHAR(255),
+  `id` INTEGER NOT NULL AUTO_INCREMENT,
+  `roomname` VARCHAR(255),
   PRIMARY KEY (`id`)
 );
 
