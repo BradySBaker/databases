@@ -7,8 +7,7 @@ module.exports = {
   },
   post: function (req, res) {
     res.writeHead(201);
-    models.users.create(req.body);
-    res.end('RECIEVED');
+    models.users.create(req.body).then(() => { res.end('RECIEVED'); });
   }
 };
 

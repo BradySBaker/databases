@@ -49,7 +49,6 @@ describe('Persistent Node Chat Server', () => {
         const queryArgs = [];
 
         dbConnection.query(queryString, queryArgs, (err, results) => {
-          console.log(results);
           if (err) {
             throw err;
           }
@@ -86,15 +85,17 @@ describe('Persistent Node Chat Server', () => {
       });
   });
 
-  // it('Should not create multiple rows/ids for single user', (done) => {
-  //   axios.post(`${API_URL}/users`, { username })
-  //     .then(() => {
-  //       const queryString = 'SELECT * FROM `users`';
-  //       dbConnection.query(queryString, (err, results) => {
-  //         expect(results.length).toEqual(1);
-  //       });
-  //     });
-  // });
+  it('Should not create multiple rows/ids for single user', (done) => {
+    axios.post(`${API_URL}/users`, { username })
+      .then(() => {
+        const queryString = 'SELECT * FROM `users` WHERE username = ?';
+        dbConnection.query(queryString, [username], (err, results) => {
+          console.log(results);
+          expect(results.length).toEqual(1);
+          done();
+        });
+      });
+  });
 
 });
 
